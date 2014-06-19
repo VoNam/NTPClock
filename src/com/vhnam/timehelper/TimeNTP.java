@@ -3,7 +3,11 @@ package com.vhnam.timehelper;
 import java.util.Date;
 import java.util.Observable;
 
+import com.vhnam.network.NetworkUtil;
+
+import android.content.Context;
 import android.text.format.DateUtils;
+import android.widget.Toast;
 
 public class TimeNTP extends Observable {
 	private static TimeNTP mTimeNTP =  new TimeNTP();
@@ -33,6 +37,14 @@ public class TimeNTP extends Observable {
 		new Thread(runnable).start();
 	}
 	
+	public Date getDate(Context context) {
+		if (NetworkUtil.isConnected(context)) {
+			Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
+			return new Date(System.currentTimeMillis());
+		} else {
+			return new Date(System.currentTimeMillis());
+		}
+	}
 	public void updateFromNTPServer() {
 		
 	}

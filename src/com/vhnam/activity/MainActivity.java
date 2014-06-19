@@ -8,6 +8,7 @@ import com.vhnam.ntpclock.R;
 import com.vhnam.timehelper.TimeNTP;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
@@ -15,16 +16,19 @@ import android.widget.TextView;
 public class MainActivity extends Activity implements Observer{
 	private TextView mTxtDate;
 	private Handler mHandler = new Handler();
+	private Context mContext;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+		mContext = this;
 		
 		mTxtDate = (TextView) findViewById(R.id.txtDate);
 		
 		TimeNTP timeNTP = TimeNTP.getInstance();
 		timeNTP.addObserver(this);
-		timeNTP.updateSecond(new Date(System.currentTimeMillis()));
+		timeNTP.updateSecond(timeNTP.getDate(mContext));
 	}
 
 	@Override
