@@ -9,13 +9,11 @@ import org.apache.commons.net.ntp.TimeInfo;
 
 import android.content.Context;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.vhnam.network.NetworkUtil;
 
 public class TimeNTP extends Observable {
 	private static TimeNTP timeNTP = new TimeNTP();
-	private long scheduleUpdate = 10 * DateUtils.MINUTE_IN_MILLIS;
 	public static final String TIME_SERVER = "time-a.nist.gov";
 
 	public static TimeNTP getInstance() {
@@ -31,14 +29,7 @@ public class TimeNTP extends Observable {
 
 				setChanged();
 				notifyObservers(d);
-
 				updateSecond(d);
-				try {
-					Thread.sleep(scheduleUpdate);
-					updateTime(mContext);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 		};
 		new Thread(runnable).start();
@@ -82,10 +73,7 @@ public class TimeNTP extends Observable {
 			InetAddress inetAddress = InetAddress.getByName(TIME_SERVER);
 			TimeInfo timeInfo = timeClient.getTime(inetAddress);
 			long returnTime = timeInfo.getMessage().getTransmitTimeStamp()
-					.getTime(); // server time
-
-//			Date time = new Date(returnTime);
-//			Log.d("TEST", "Time from " + TIME_SERVER + ": " + time);
+					.getTime();
 
 			return returnTime;
 		} catch (Exception e) {

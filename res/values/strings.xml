@@ -3,4 +3,5 @@
     <string name="app_name">NTPClock</string>
 	<string name="load_time">Time is loading&#8230;</string>
 	<string name="update_time">Update Time</string>
+	<string name="status">Time to update:</string>
 </resources>
