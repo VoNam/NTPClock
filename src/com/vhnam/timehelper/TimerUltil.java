@@ -7,7 +7,7 @@ import android.text.format.DateUtils;
 
 public class TimerUltil extends Observable {
 	private static TimerUltil mTimerUltil = new TimerUltil();
-	public static long SCHEDULE_UPDATE = 5 * DateUtils.SECOND_IN_MILLIS;// 10*DateUtils.MINUTE_IN_MILLIS;
+	public static long SCHEDULE_UPDATE = 10*DateUtils.MINUTE_IN_MILLIS;
 	private Thread mTimerThread = null;
 
 	public static TimerUltil getInstance() {
