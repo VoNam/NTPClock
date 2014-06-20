@@ -84,8 +84,8 @@ public class TimeNTP extends Observable {
 			long returnTime = timeInfo.getMessage().getTransmitTimeStamp()
 					.getTime(); // server time
 
-			Date time = new Date(returnTime);
-			Log.d("TEST", "Time from " + TIME_SERVER + ": " + time);
+//			Date time = new Date(returnTime);
+//			Log.d("TEST", "Time from " + TIME_SERVER + ": " + time);
 
 			return returnTime;
 		} catch (Exception e) {
