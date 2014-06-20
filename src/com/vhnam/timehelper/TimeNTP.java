@@ -1,31 +1,58 @@
 package com.vhnam.timehelper;
 
+import java.net.InetAddress;
 import java.util.Date;
 import java.util.Observable;
 
-import com.vhnam.network.NetworkUtil;
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 
 import android.content.Context;
 import android.text.format.DateUtils;
-import android.widget.Toast;
+import android.util.Log;
+
+import com.vhnam.network.NetworkUtil;
 
 public class TimeNTP extends Observable {
-	private static TimeNTP mTimeNTP =  new TimeNTP();
-	
+	private static TimeNTP timeNTP = new TimeNTP();
+	private long scheduleUpdate = 10 * DateUtils.MINUTE_IN_MILLIS;
+	public static final String TIME_SERVER = "time-a.nist.gov";
+
 	public static TimeNTP getInstance() {
-		return mTimeNTP;
+		return timeNTP;
 	}
-	
-	public void updateSecond(final Date date) {
-		Runnable runnable = new Runnable() {			
+
+	public void updateTime(final Context mContext) {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				Date d = getDate(mContext);
+				d.setTime(d.getTime());
+
+				setChanged();
+				notifyObservers(d);
+
+				updateSecond(d);
+				try {
+					Thread.sleep(scheduleUpdate);
+					updateTime(mContext);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		new Thread(runnable).start();
+	}
+
+	private void updateSecond(final Date date) {
+		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				Date d = date;
 				d.setTime(d.getTime() + DateUtils.SECOND_IN_MILLIS);
-				
+
 				setChanged();
-				notifyObservers(d);		
-				
+				notifyObservers(d);
 				try {
 					Thread.sleep(DateUtils.SECOND_IN_MILLIS);
 					updateSecond(d);
@@ -36,16 +63,34 @@ public class TimeNTP extends Observable {
 		};
 		new Thread(runnable).start();
 	}
-	
-	public Date getDate(Context context) {
+
+	private Date getDate(Context context) {
 		if (NetworkUtil.isConnected(context)) {
-			Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
-			return new Date(System.currentTimeMillis());
+			long time = getCurrentNetworkTime();
+			if (time == 0) {
+				return new Date(System.currentTimeMillis());
+			}
+			return new Date(time);
 		} else {
 			return new Date(System.currentTimeMillis());
 		}
 	}
-	public void updateFromNTPServer() {
-		
+
+	private long getCurrentNetworkTime() {
+		try {
+			NTPUDPClient timeClient = new NTPUDPClient();
+			InetAddress inetAddress = InetAddress.getByName(TIME_SERVER);
+			TimeInfo timeInfo = timeClient.getTime(inetAddress);
+			long returnTime = timeInfo.getMessage().getTransmitTimeStamp()
+					.getTime(); // server time
+
+			Date time = new Date(returnTime);
+			Log.d("TEST", "Time from " + TIME_SERVER + ": " + time);
+
+			return returnTime;
+		} catch (Exception e) {
+			e.getStackTrace();
+		}
+		return 0;
 	}
 }
